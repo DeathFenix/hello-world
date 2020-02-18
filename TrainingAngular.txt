@@ -1,0 +1,29 @@
+Components 				-->	(Section - 2 / Assignment 1)
+	New Component
+	Nested Componet
+Databinding 				-->	(Section - 2 / Assignment 2)
+	String interpolation
+	Property binding
+	Event Binding
+	Two-way-Databinding
+Directives 				-->	(Section - 2 / Assignment 3)
+	*ngIf
+	*ngStyle
+	*ngClass
+	*ngFor
+Components and Databinding Advanced	++>	(Section - 5 / Assignment 4) 
+	@Input
+	@Output
+	@ViewChild
+	@ContentChild
+Directives Advanced 			++>	(Section - 7 )
+	Renderer
+	HostListener
+	HostBinding
+	*ngSwitch 
+Services				++>	(Section - 9 / Assignment 5) 
+	Logging Service
+	Data Service
+	Dependency Injection
+	@Injectable
+Routing

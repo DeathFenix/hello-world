@@ -1,0 +1,490 @@
+#instalação angular
+	npm install -g @angular/cli@latest or 6.0.0
+#criando primeiro projeto
+	ng new my-first-app 	(dentro da pasta do projeto)
+#starting server
+	ng serve		(dentro da pasta do app)
+	localhost:4200
+	
+	ERROR in node_modules/rxjs/internal/types.d.ts(81,44): error TS1005: ';' expected.
+	alterar rjx e rodar npm install de novo
+#biding dados
+	<input type="text" [(ngModel)]="name">
+	<p>{{ name }}</p>
+#instalando bootstrap no projeto
+	-npm install --save bootstrap@3
+	-adicionar linha no arquivo angular.json
+	    "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/styles.css"
+            ],
+#criando um component
+	import { Component } from "@angular/core";
+	@Component({
+    		selector: 'app-server',
+    		templateUrl: './server.component.html'
+	})
+
+	export class ServerComponent{
+	}
+#criando componentes com CLI
+	ng generate component <name>
+	ng g c <name>
+#alterando estilo in line ou external files
+	@Component({
+  	selector: 'app-root',
+  	templateUrl: './app.component.html',
+  	//styleUrls: ['./app.component.css']
+  	styles: [`
+    		h3 {
+      			color: pink;
+    		}
+    		`]
+	})
+#selector by classe ou atributo
+	selector: '.app-servers'	<div app-servers ></div>
+	selector: '[app-servers]'	<div class="app-servers></div>
+
+----------------------------------------------------------------------------
+#databinding
+	String interpolation {{ data }} 	==>
+	Property Binding [property]="data"	==>
+						<==	Event Binding (event)="expression"
+	Combination of Both Two-Way-Binding	<=> 	[(NgModel]="data"
+#string interpolation
+
+export class Component{
+	data = teste;
+	expression = 10 + 20
+
+	sum(){
+		return this.expression;
+	}
+}
+<p>	{{ data }} or {{ method }} or {{ expression }} </p>
+
+#property interpolation
+	[disabled]="!allowNewServer"
+#event binding
+	(click)="onCreateServer()"
+#passing and using data by event
+	$event
+	(input)="onUpdateNameServer($event)">
+	onUpdateNameServer(event: Event){
+    		this.serverName = (<HTMLInputElement>event.target).value;
+  	}
+#two-way-databinding
+	[(ngModel)]="nomeAtributo"
+#exercicio databinding
+	[disabled]="userName === ''" (click)="userName = ''"
+	[(ngModel)]="userName" (keyup)="onChangeUserName()"
+#ngIf
+	<p *ngIf="serverCreated; else noServe">
+	<ng-template #noServe>
+    		<p>No server was created.</p>
+	</ng-template>
+#ngStyle
+	[ngStyle]="{backgroundColor: getColor()}"
+	getColor(){
+        	return this.serverStatus === 'online' ? 'green' : 'red';
+    	}
+#CSS dynamically with ngClass
+	[ngClass]="{online: serverStatus === 'online'}"
+	styles: [`
+        	.online {
+            		color: white;
+        	}
+    	`]
+#output List with ngFor
+	<p *ngFor="let logItem of log" 
+      	[ngStyle]="{backgroundColor: logItem >= 5 ? 'blue' : 'transparent'}"
+      	[ngClass]="{color: logItem >= 5 }"
+      	>{{ logItem }}</p>
+#ngFor index
+	<p *ngFor="let logItem of log; let i = index" 
+      	[ngStyle]="{backgroundColor: i >=4  ? 'blue' : 'transparent'}"
+      	[ngClass]="{color: i >= 4 }"
+      	>{{ logItem }}</p>
+#PROJECT 1
+	ng g c recipes --spec false
+#model.ts
+	export class Recipe {
+    		public name: string;
+    		public description: string;
+    		public imagePath: string;
+
+    		constructor(name: string, desc: string, imagePath: string){
+        		this.name = name;
+        		this.description = desc;
+        		this.imagePath = imagePath;
+    		}
+	}
+#adicionando itens a model
+	recipe: Recipe[] = [
+    		new Recipe('A Test Recipe', 'This is simply a test', 'https://cdn.pixabay.com/photo/2016/06/15/19/09/food-1459693_960_720.jpg')
+  	];
+#56-Ingredient model
+	export class Ingredient {
+    		constructor(public name: string, public amount: number){}
+	}
+#61-debuggin Souce Maps browser
+#62-debugg Augury
+#66-ligando componentes e propriedades- component parent to child
+	@Input() element: {type: string, name: string, content: string };
+
+	serverElements = [{type: 'server', name: 'TestServer', content: 'Just a test'}];
+
+	<app-server-element 
+        *ngFor="let serverElement of serverElements"
+        [element]="serverElement"></app-server-element>
+#67-alias para propriedade ser usada fora do componente
+	 @Input('srvElement') element: {type: string, name: string, content: string };
+
+	<app-server-element 
+        *ngFor="let serverElement of serverElements"
+        [srvElement]="serverElement"></app-server-element>
+#68-envent emmiter - component child to parent
+	<app-cockpit 
+    		(serverCreated)="onServerAdded($event)"
+    		(bpCreated)="onBlueprintAdded($event)">
+  	</app-cockpit>
+
+	@Output() serverCreated = new EventEmitter<{serverName: string, serverContent: string}>();
+  	@Output('bpCreated') blueprintCreated = new EventEmitter<{serverName: string, serverContent: string}>();
+
+	this.serverCreated.emit({
+      		serverName: this.newServerName,
+      		serverContent: this.newServerContent
+    	});
+#72-view encapsulation css -encapsular css para interferir somente no componente
+	encapsulation: ViewEncapsulation.Emulated //Native, None
+#73-local references criar "variavel" de um elemento para usar como referencia
+	<input type="text" class="form-control" #serverNameInput>	
+	(click)="onAddServer(serverNameInput)"
+	 onAddServer(nameInput: HTMLInputElement) {
+    		this.serverCreated.emit({
+      			serverName: nameInput.value,
+      			serverContent: this.newServerContent
+    		});
+  	}
+#74- @ViewChild - acessando elemento DOM com viewchild
+	<input type="text" class="form-control" #serverContentInput>
+	@ViewChild('serverContentInput', {static: true}) serverContentInput: ElementRef;
+	serverContent:  this.serverContentInput.nativeElement.value
+#76-ng-content
+	<div class="panel-body">
+        	<ng-content></ng-content>
+    	</div>
+#77-lifecycle hooks
+	1 - contructor
+	2 - ngOnChanges 		- chamado depois que propriedades de input mudam
+	3 - ngOnInit			- quando um componente é inicializado
+	4 - ngDoCheck			- durante qualquer mudança for detectada
+	5 - ngAfterContentInit		- depois que um ng-content foi projetado em uma view
+	6 - ngAfterContentChecked	- depois que cada conteudo projetado for verificado
+	7 - ngAfterViewInit		- depois que os componentes e filhos foram initializados
+	8 - ngAfterViewChecked		- depois que cada componente foi verificado
+	9 - ngOnDestroy			- chamado uma vez que o componente for destruido
+#81-@ContentChild()
+	@ContentChild('contentParagraph', {static: true}) paragraph: ElementRef;
+#83- event Emmiter / binding parent child
+	childComponent > 
+		evntEmmiter = new EventEmitter<number>();
+		this.evntEmmiter.emit( this.incNumber + 1 );
+	parentComponent >
+		<app-child-component (evntEmmiter)="intervalFired($event)"></app-child-component>
+		intervalFired(numberFired: number){
+    			console.log(numberFired);
+  		}
+	-----------------
+	parentComponent >
+		<app-child *ngFor="let oddNumber of oddNumbers" [number]="oddNumber"></app-child>
+		oddNumbers: number[] = [];
+	childComponent >
+		<p>Odd - {{ number }}</p>   
+		 @Input() number: number;
+#85-project navigatebar
+	<li><a href="#" (click)="onSelect('recipe')">Recipes</a></li>
+        <li><a href="#" (click)="onSelect('shopping-list')">Shopping List</a></li>
+	---------------
+	@Output() featureSelected = new EventEmitter<string>();
+	onSelect(feature: string){
+        	this.featureSelected.emit(feature);
+    	}
+	---------------
+	<app-header (featureSelected)="onNavigate($event)"></app-header>
+	<app-recipes *ngIf="loadedFeature === 'recipe'"></app-recipes>
+      	<app-shopping-list *ngIf="loadedFeature !== 'recipe'"></app-shopping-list>
+	---------------
+	loadedFeature = 'recipe';
+  	onNavigate(feature: string){
+    		this.loadedFeature = feature;
+  	}
+#86-passing recipe data binding
+	<div class="col-xs-12">
+        	<app-recipe-item 
+        	*ngFor="let recipeEl of recipes"
+        	[recipe]="recipeEl"></app-recipe-item>
+    	</div>
+	---------------
+	@Input() recipe: Recipe;
+#87-property binding (combined)
+	<app-recipe-detail 
+    		*ngIf="selectedRecipe; else infoText" 
+    		[recipe]="selectedRecipe">
+  	</app-recipe-detail> 
+  	<ng-template #infoText>
+    		<p>Please select a Recipe!</p>
+  	</ng-template>
+#89-add ingredients
+#90-ngFor and NgIf recap
+#91-ngClass and ngStyle recap
+	[ngClass]="{odd: even % 2 !== 0}" 
+        [ngStyle]="{backgroundColor: even % 2 !== 0 ? 'yellow' : 'transparent' }"
+#93-Creating basic atributte directive
+	import { OnInit, Directive, ElementRef } from "@angular/core";
+	@Directive({
+    		selector: '[appBasicHighlight]'
+	})
+	export class BasicHighlightDirective implements OnInit {
+
+    		constructor(private elementRef: ElementRef){
+    		}
+
+    		ngOnInit(){
+        		this.elementRef.nativeElement.style.backgroundColor = 'green';
+    		}
+	}
+#94-Renderer attribute directive
+	import { OnInit, Directive, ElementRef, Renderer2 } from "@angular/core";
+	@Directive({
+    		selector: '[appBetterHighlight]'
+	})
+	export class BetterHighlightDirective implements OnInit {
+    		constructor(private elRef: ElementRef, private renderer: Renderer2){
+    		}
+    		ngOnInit(){
+        		this.renderer.setStyle(this.elRef.nativeElement, 'background-color', 'blue');
+    		}
+	}
+#96-@HostListener
+	@HostListener('mouseenter') mouseover(){
+        	this.renderer.setStyle(this.elRef.nativeElement, 'background-color', 'blue');
+    	}
+#97-@HostBinding
+	@HostBinding('style.backgroundColor') backgroundColor: string = 'transparent';
+#98-Binding to Directives Properties
+	@Input() defaultColor: string = 'transparent';
+    	@Input('appBetterHighlight') highlightColor: string = 'blue';
+	---------------
+	<p [appBetterHighlight]="'red'" defaultColor="yellow">Style me with better directive</p>
+#100-Building Structural Directives
+	import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+	@Directive({
+  		selector: '[appUnless]'
+	})
+	export class UnlessDirective {
+  		@Input() set appUnless(condition: boolean){
+    			if(!condition){
+      				this.vcRef.createEmbeddedView(this.templateRef);
+    			}else{
+      				this.vcRef.clear();
+    			}
+  		}
+  		constructor(private templateRef: TemplateRef<any>, private vcRef: ViewContainerRef ) { }
+	}
+	---------------
+	<div *appUnless="onlyOdd">
+#101-ngSwitch
+	<div [ngSwitch]="value">
+        	<p *ngSwitchCase="5">Value is 5</p>
+        	<p *ngSwitchCase="10">Value is 10</p>
+        	<p *ngSwitchDefault>Value is default</p>
+      	</div>
+#102-project Directives @HostListener @HostBiding
+	@Directive({
+    		selector: '[appDropdown]'
+	})
+		export class DropdownDirective{
+    		@HostBinding('class.open') isOpen = false;
+    		@HostListener('click') toggleOpen(){
+        		this.isOpen = !this.isOpen;
+    		} 
+	}
+#104-Services
+#106-creating logging service
+	export class LoggingService {
+    		logStatusChange(status: string){
+        		console.log('A server status changed, new status: ' + status);
+    		}
+	}
+	---------------
+	import { AccountsService } from '../accounts.service';
+
+	providers: [LoggingService, AccountsService]
+
+	constructor(private loggingService: LoggingService,
+              private accountService: AccountsService){}
+
+	onSetTo(status: string) {
+    		this.accountService.updateStatus(this.id, status);
+    		this.loggingService.logStatusChange(status);
+  	}
+#108-creating data service
+	export class AccountsService{
+    		accounts = [{
+          		name: 'Master Account',
+          		status: 'active'
+        		},
+        		{
+          		name: 'Testaccount',
+          		status: 'inactive'
+        		},
+        		{
+          		name: 'Hidden Account',
+          		status: 'unknown'
+        		}
+      		];
+
+      		addAccount(name: string, status: string){
+        		this.accounts.push({name: name, status: status});
+      		}
+
+      		updateStatus(id: number, status: string){
+        		this.accounts[id].status = status;
+      		}
+	}
+	--------------
+	import { AccountsService } from '../accounts.service';
+
+	providers: [LoggingService, AccountsService]
+
+	constructor(private loggingService: LoggingService,
+              private accountService: AccountsService){}
+
+	onSetTo(status: string) {
+    		this.accountService.updateStatus(this.id, status);
+    		this.loggingService.logStatusChange(status);
+  	}
+#110-Corrigindo as instancias de serviço
+	providers: [LoggingService]
+#111-Injecting services to service
+	@injectable
+#112-Services cross component communication
+	constructor(private loggingService: LoggingService,
+              	private accountService: AccountsService){
+    			this.accountService.statusUpdated.subscribe(
+      			(status: string) => alert('New Status: ' + status)
+    		);
+  	}
+	-------------
+	onSetTo(status: string) {
+    		this.accountService.updateStatus(this.id, status);
+    		this.accountService.statusUpdated.emit(status);
+  	}
+	-------------
+	statusUpdated = new EventEmitter<string>();
+#117-Recipe Service
+	import { Recipe } from "./recipe.model";
+	export class RecipeService{
+    		private recipes: Recipe[] = [
+        		new Recipe('A Test Recipe', 'This is simply a test', 'https://cdn.pixabay.com/photo/2016/06/15/19/09/food-1459693_960_720.jpg'),
+        		new Recipe('Another Test Recipe', 'This is simply a test', 'https://cdn.pixabay.com/photo/2016/06/15/19/09/food-1459693_960_720.jpg')
+    		];
+
+    		getRecipes(){
+        		return this.recipes.slice();
+    		}
+	}
+#119-ShoppingList Service
+	import { Ingredient } from "../shared/ingredient.model";
+	import { EventEmitter } from "@angular/core";
+
+	export class ShoppingListService{
+    		ingredientsChanged = new EventEmitter<Ingredient[]>();
+
+    		private ingredients: Ingredient[] = [
+        		new Ingredient( 'Apples', 5),
+        		new Ingredient( 'Tomatoes', 10)
+      		];
+
+      		getIngredients(){
+          		return this.ingredients.slice();
+      		}
+
+      		addIngredient(ingredient: Ingredient){
+          		this.ingredients.push(ingredient);
+          		this.ingredientsChanged.emit(this.ingredients.slice());
+      		}    
+	}
+#121-Adding Ingredients
+	public ingredients: Ingredient[];
+	this.ingredients = ingredients;
+	-------------	
+	new Recipe(
+            'A Tasty Schnitzel',         
+            'A super-tasty Schnitzel - just awesome!', 
+            'https://previews.123rf.com/images/boomeart/boomeart1905/boomeart190501874/124030252-tasty-schnitzel-in-breading-with-fried-potato-onion-and-mushrooms.jpg', 
+            [
+                new Ingredient('Meat', 1),
+                new Ingredient('Frenc Fries', 20)
+            ])
+	-------------	
+	<ul class="list-group">
+      	<li
+        	class="list-group-item"
+        	*ngFor="let ingredient of recipe.ingredients">
+        	{{ ingredient.name }} - {{ ingredient.amount }}
+      	</li>
+    	</ul>
+#126-Setting up a loading routes
+	import { Routes, RouterModule } from '@angular/router';
+	const appRoutes: Routes = [
+  		{path: '', component: HomeComponent},
+  		{path: 'users', component: UsersComponent},
+  		{path: 'servers', component: ServersComponent}
+	];
+	RouterModule.forRoot(appRoutes)
+	-------------
+	<router-outlet></router-outlet>
+#127-Navigating with RouterLink
+	<li role="presentation" class="active"><a routerLink="/">Home</a></li>
+        <li role="presentation"><a routerLink="/servers">Servers</a></li>
+        <li role="presentation"><a [routerLink]="['/users']">Users</a></li>
+#129-Styling Active router links
+	<li role="presentation" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><a routerLink="/">Home</a></li>
+        <li role="presentation" routerLinkActive="active"><a routerLink="/servers">Servers</a></li>
+        <li role="presentation" routerLinkActive="active"><a [routerLink]="['/users']">Users</a></li>
+#130-Navigating Programmatically
+	<button class="btn btn-primary" (click)="onLoadServers()">Load Server</button>
+	-------------
+	import { Router } from '@angular/router';
+	constructor(private router: Router) { }
+	onLoadServers(){
+    		this.router.navigate(['/servers']);
+  	}
+#131-Relative path in Programmatic Navigation
+	<button class="btn btn-primary" (click)="onReload()">Reload Page</button>	
+	-------------
+	import { Router, ActivatedRoute } from '@angular/router';
+	constructor(private serversService: ServersService,
+              private router: Router,
+              private route: ActivatedRoute) { }
+	onReload(){
+    		this.router.navigate(['servers'], {relativeTo: this.route});
+  	}
+#132-Passing Parameters
+	{path: 'users/:id', component: UserComponent},
+#133-Fetching route parameters
+	{path: 'users/:id/:name', component: UserComponent},
+	-------------
+	<p>User with ID {{ user.id }} loaded.</p>
+	<p>User name is {{ user.name }}</p>
+	-------------
+	constructor(private route: ActivatedRoute) { }
+  	ngOnInit() {
+    		this.user = {
+      			id: this.route.snapshot.params['id'],
+      			name: this.route.snapshot.params['name']
+    		}
+  	}
